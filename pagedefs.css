@@ -1,0 +1,399 @@
+/* use with css_browser_selector.js
+    http://rafael.adm.br/css_browser_selector/
+    http://37signals.com/svn/archives2/browser_selectors_in_css.php
+*/
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+.ie .example {
+    background-color: blue;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+.gecko .example {
+    background-color: gray
+}
+.opera .example {
+    background-color: yellow
+}
+.konqueror .example {
+    background-color: blue
+}
+.webkit .example {
+    background-color: black
+}
+.example {
+    width: 100px;
+    height: 100px;
+}
+
+/* Sticky Footer by Ryan Fait http://ryanfait.com/ */
+.wrapper {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	margin: 0 auto -142px; /* the bottom margin is the negative value of the footer's height */
+}
+.footer, .push {
+	height: 142px; /* .push must be the same height as .footer */
+}
+
+#aplayer {
+    POSITION: relative;
+    margin: 20 auto;
+    padding: 5px;
+    border: 1px solid white;
+    width: 195px;
+    height: 20px;
+    BACKGROUND-COLOR: black;
+}
+
+#container {
+    min-height: 100%;
+    /*
+    background-color: #DDD;
+    width: 676px;
+    */
+    border-left: 2px solid #666;
+    border-right: 2px solid #666;
+    margin: 0 auto;
+}
+
+* html #container {
+    height: 100%;
+}
+
+img {
+    border: none;
+}
+
+img#gdbear {
+    POSITION: fixed;
+    TOP: 10px;
+    RIGHT: 10px;
+}
+
+HTML {
+    HEIGHT: 100%; /* fixes the display height in Mozilla and Firefox */
+    MAX-HEIGHT: 100%; /* fixes the display height in Mozilla and Firefox */
+    BACKGROUND: tan url(null) fixed no-repeat; /* Mozilla has problems when the body background is different to the html background */
+}
+
+BODY {
+    HEIGHT: 100%; /* fixes the display height in Mozilla and Firefox */
+    FONT: 10px verdana, arial, helvetica, sans-serif;
+    COLOR: blue;
+    MARGIN: 0px;
+    PADDING: 0;
+    BACKGROUND-COLOR: tan;
+}
+/*
+.ie HTML {
+.ie BODY {
+    overflow: auto;
+*/
+.ie HTML, .ie BODY  {
+    /*
+    BACKGROUND: url(null) fixed no-repeat;
+    background-color: green;
+    */
+    background-color: rgb(30,139,70);
+    PADDING: 0 0 101px 0; /* for IE6 to bring the bottom of the body up to the bottom of the screen (the extra 1px is for the border) */
+}
+
+div#upper {
+    POSITION: relative;
+}
+div#lower {
+    POSITION: relative;
+}
+
+div#left {
+    /* FLOAT: left;*/
+    POSITION: fixed;
+    BACKGROUND: fixed;
+    /* TOP: 20px; */
+    PADDING-TOP: 10px;
+    PADDING-LEFT: 5px;
+    PADDING-BOTTOM: 35px;
+    WIDTH: 185px;
+}
+
+div#right {
+    POSITION: absolute;
+    FLOAT: left;
+    /* TOP: 20px; */
+    /*LEFT: 190px;*/
+    LEFT: 200px;
+    RIGHT: 10px;
+    PADDING-TOP: 10px;
+    PADDING-LEFT: 10px;
+    PADDING-BOTTOM: 20px;
+}
+
+div#top {
+    COLOR: #000;
+}
+
+div#content {
+    FLOAT: left;
+    PADDING-TOP: 0px;
+    PADDING-RIGHT: 5px;
+    PADDING-LEFT: 8px;
+    /* PADDING-BOTTOM: 70px; */
+    MAX-WIDTH: 32%;
+    /*OVERFLOW: hidden;*/
+}
+
+#footer {
+    POSITION: fixed;
+    FONT-SIZE: 18px;
+    TEXT-SHADOW: #000 1px 1px 1px; 
+    COLOR: #fff;
+    BOTTOM: -1px;
+    _BOTTOM: -3px;
+    WIDTH: 100%;
+    PADDING: 10px 10px 10px 10px;
+    LINE-HEIGHT: 1.5;
+    HEIGHT: 30px;
+    /*
+    BACKGROUND: blue URL(ed_hotmail.png) fixed center no-repeat scroll 0% !important;
+     */
+    BACKGROUND-COLOR: blue;
+    BACKGROUND: blue URL(ed_hotmail.png) fixed center no-repeat;
+    filter: alpha(opacity=50); 
+    -moz-opacity: 0.5; 
+    opacity: 0.5; 
+    z-index: 2;
+}
+
+
+/*
+ * see http://code.google.com/p/ie7-js/
+ *  to support the fixed position
+ */
+
+.ie #footer {
+    position:absolute;
+    HEIGHT: 50px;
+    LEFT: 0px;
+    filter:none !important;
+}
+
+#footer-content {
+    position:relative;
+    margin:0 auto;
+    PADDING:0;
+}
+
+.ie ul#cat-box.show-urls {
+    background:transparent none repeat scroll 0% !important;
+    top:-14em !important;
+    z-index:999;
+}
+
+.ie div#right {
+}
+.ie div#left {
+}
+.ie div#content {
+    PADDING-BOTTOM: 0px;
+    OVERFLOW: none;
+}
+
+
+#item {
+    POSITION: relative;
+    FONT: 12px verdana, arial, helvetica, sans-serif;
+    TEXT-DECORATION: none;
+}
+#itemtest {
+    font-size: 12px;
+    FONT: 10px verdana, arial, helvetica, sans-serif;
+    color: green
+}
+
+span#heading {
+    POSITION: relative;
+    TOP: 0px;
+    PADDING-TOP: 10px;
+    COLOR: rgb(220,80,80);
+    FONT: 12px verdana, arial, helvetica, sans-serif;
+    FONT-WEIGHT: bold;
+    DISPLAY: block;
+    TEXT-DECORATION: none;
+}
+
+H1 {
+    PADDING-BOTTOM: 1em;
+    MARGIN: 0px;
+    FONT-SIZE: 12px;
+    LINE-HEIGHT: 150%;
+}
+ul {
+    POSITION: relative;
+    TOP: 0px;
+    PADDING-TOP: 0px;
+    COLOR: red;
+    /*TEXT-SHADOW: #000 1px 1px 1px; */
+    FONT: 14px verdana, arial, helvetica, sans-serif;
+    FONT-WEIGHT: bold;
+    TEXT-DECORATION: none;
+}
+li {
+    POSITION: relative;
+    FONT: 10px verdana, arial, helvetica, sans-serif;
+    TEXT-DECORATION: none;
+    COLOR: blue;
+}
+
+center#pagetitle {
+    FONT-SIZE: 18px;
+    FONT-WEIGHT: bold;
+    LINE-HEIGHT: 150%;
+}
+
+center#below {
+    PADDING-TOP: 10px;
+    COLOR: purple;
+    FONT-SIZE: 14px;
+    FONT-WEIGHT: bold;
+    FLOAT: left;
+    WIDTH: 99%;
+}
+
+span#left {
+    PADDING-TOP: 0px;
+    PADDING-LEFT: 12px;
+    TOP: 0px;
+    FLOAT: left;
+}
+
+input.text {
+    BORDER-WIDTH: 0 0 0 0;
+    BORDER-STYLE: solid;
+    BACKGROUND-COLOR: blue;
+    COLOR: #ffffff;
+    FONT-SIZE: 14px;
+}
+
+span#right {
+    PADDING-TOP: 0px;
+    PADDING-RIGHT: 12px;
+    TOP: 0px;
+    FLOAT: right;
+    BACKGROUND-COLOR: blue;
+    COLOR: #fff;
+}
+
+ul#twitter_update_list {
+    list-style: none;
+}
+
+ul#twitter_update_list li {
+    COLOR: rgb(0,0,0);
+    PADDING-LEFT: 2px;
+    FONT-FAMILY: verdana, arial, helvetica, sans-serif;
+    FONT-SIZE: 11px;
+}
+
+div#twitter_div {
+    COLOR: rgb(0,0,0);
+    /* FONT: 12px helvetica, arial, verdana, sans-serif; */
+    BACKGROUND: #9ae4e8;
+    BORDER-WIDTH: 1;
+    BORDER-STYLE: solid;
+    PADDING: 5px 5px 5px 5px;
+    WIDTH: 180px;
+    MAX-WIDTH: 185px;
+    /* text-wrap: normal; */
+    word-wrap: break-word;
+}
+
+#content {
+    PADDING-BOTTOM: 1em;
+    MARGIN: 1px;
+}
+
+#content A {
+    POSITION: relative;
+    PADDING-TOP: 2px;
+    FONT: 10px verdana, arial, helvetica, sans-serif;
+    /*FONT: 12px verdana, arial, helvetica, sans-serif;*/
+    DISPLAY: block;
+    TEXT-DECORATION: none;
+}
+
+#content A:hover {
+    color: green;
+    /* font-size: 16px; */
+}
+
+div#footer A:link { color: wheat; }
+div#footer A:visited { color: wheat }
+div#footer A:active { color: wheat; background: #ffd700; }
+div#footer A:hover { color: orange; }
+
+.awesome {
+    background: #222 url(/images/alert-overlay.png) repeat-x;
+    display: inline-block;
+    padding: 5px 10px 6px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    line-height: 1;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: 0 1px 3px #999;
+    -webkit-box-shadow: 0 1px 3px #999;
+    text-shadow: 0 -1px 1px #222;
+    border-bottom: 1px solid #222;
+    position: relative;
+    cursor: pointer;
+}
+
+.awesome-extra {
+   /*...*/
+   -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+   -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+   text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+   border-bottom: 1px solid rgba(0,0,0,0.25);
+   /*...*/
+}
+
+/* Sizes ---------- */
+.small .awesome {
+    font-size: 11px;
+}
+.medium.awesome {
+    font-size: 13px;
+}
+.large .awesome {
+    font-size: 14px;
+    padding: 8px 14px 9px;
+}
+.super .awesome {
+    font-size: 16px;
+    padding: 10px 14px 9px;
+}
+
+/* Colors ---------- */
+.blue .awesome {
+    background-color: #2daebf;
+}
+.red .awesome {
+    background-color: #e33100;
+}
+.magenta .awesome {
+    background-color: #a9014b;
+}
+.orange .awesome {
+    background-color: #ff5c00;
+}
+.yellow .awesome {
+    background-color: #ffb515;
+}
+

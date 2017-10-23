@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ed's GeoLocation Tests</title>
+    <style type="text/css">
+	html { height: 100% }
+	body { height: 100%; margin: 10; padding: 10 }
+	#map_canvas {
+	    height: 400px;
+	    width: 600px;
+	    border-right: 1px solid #666666;
+	    border-bottom: 1px solid #666666;
+	    border-top: 1px solid #AAAAAA;
+	    border-left: 1px solid #AAAAAA;
+	}
+    </style>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDBp6HMljcKYb-V0ngwo80prfnWo_XbwWE&sensor=false" type="text/javascript"></script>
+    <!--script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script-->
+    <script>
+	function initiate_geolocation() {
+	    navigator.geolocation.getCurrentPosition(show_map, handle_geolocation_error,{maximumAge: 75000});
+	    //navigator.geolocation.getCurrentPosition(handle_geolocation_query, handle_geolocation_error,{maximumAge: 75000});
+	    var text = "looking up position...";
+	    var s = document.querySelector('#status');
+	    s.innerHTML = text;
+	    s.className = 'not ok';
+	}
+
+	function handle_geolocation_error(error) {
+	    var x = document.querySelector('#status');
+	    switch(error.code)
+	    {
+	    case error.PERMISSION_DENIED:
+		x.innerHTML="User denied the request for Geolocation.";
+		break;
+	    case error.POSITION_UNAVAILABLE:
+		x.innerHTML="Location information is unavailable.";
+		break;
+	    case error.TIMEOUT:
+		x.innerHTML="The request to get user location timed out.";
+		break;
+	    case error.UNKNOWN_ERROR:
+		x.innerHTML="An unknown error occurred.";
+		break;
+	    }
+	}
+
+	function showLocation(position) {
+	    var val = "";
+	    //for (var property in position) {
+		//val += property + ' contains ' + position[property]+'<br>';
+	    //} 
+
+	    var text =  "Latitude:  " + position.coords.latitude  + "<br/>" +  
+			"Longitude: " + position.coords.longitude + "<br/>" +  
+			"Accuracy:  " + position.coords.accuracy  + "m<br/>" +  
+			"Time:      " + new Date(position.timestamp) + "<br>" + val;  
+
+	    var s = document.querySelector('#info');
+	    s.innerHTML = text;
+	}
+
+	function handle_geolocation_query(position) {
+	    // console.log("here I am!");
+	    var s = document.querySelector('#status');
+	    if (s.className == 'ok') {
+		return;
+	    }
+	    s.innerHTML = "found you!";
+	    s.className = 'ok';
+
+	    showLocation(position);
+
+	    var image_url = "http://maps.google.com/maps/api/staticmap?sensor=false&center="
+				+ position.coords.latitude + ',' + position.coords.longitude +
+				"&zoom=15&size=600x400&markers=color:blue|label:S|"
+				+ position.coords.latitude + ',' + position.coords.longitude;  
+
+	    //jQuery("#map_canvas").remove();  
+	    //jQuery(document.body).append(  
+		//jQuery(document.createElement("img")).attr("src", image_url).attr('id','map_canvas')  
+	    //);  
+
+	    var map_canvas = document.getElementById("map_canvas");
+	    if ( !map_canvas ) {
+		console.log("no map_canvas!");
+		s.innerHTML = "could not get map_canvas!";
+	    } else {
+		document.body.removeChild(map_canvas);
+
+		var img = new Image();
+		img.src = image_url;
+		img.id = "map_canvas";
+		document.body.appendChild(img);
+	    }
+	}
+
+	var map;
+	// much cleaner
+	function show_map(position) {
+	    var s = document.querySelector('#status');
+	    if (s.className == 'ok') {
+		return;
+	    }
+	    s.innerHTML = "found you!";
+	    s.className = 'ok';
+	    showLocation(position);
+	    // Define the coordinates as a Google Maps LatLng Object
+	    var coords = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+	    localStorage.latitude  = position.coords.latitude;
+	    localStorage.longitude = position.coords.longitude;
+
+	    // Prepare the map options
+	    var mapOptions = {
+		zoom: 15,
+		center: coords,
+		mapTypeControl: false,
+		navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL},
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+		//mapTypeId: google.maps.MapTypeId.SATELLITE
+	    };
+	    // Create the map, and place it in the map_canvas div
+	    map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+	    // Place the initial marker
+	    var marker = new google.maps.Marker({
+		position: coords,
+		map: map,
+		title: "Your current location!"
+	    });
+	}
+
+	function init_map() {
+	    var coords = new google.maps.LatLng(41.850033,-87.6500523);
+	    var zoom = 5;
+	    if ( localStorage.latitude ) {
+		coords = new google.maps.LatLng(localStorage.latitude,localStorage.longitude);
+		zoom = 15;
+		var s = document.querySelector('#status');
+		s.innerHTML = "Using last location!";
+	    }
+	    var mapOptions = {
+		zoom: zoom,
+		center: coords,
+		mapTypeControl: false,
+		navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL},
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	    };
+	    map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+
+	    if ( localStorage.latitude ) {
+		// Place the initial marker
+		var marker = new google.maps.Marker({
+		    position: coords,
+		    map: map,
+		    title: "Your current location!"
+		});
+	    }
+	}
+
+	function show_map2(loc) {
+	    showLocation(loc);
+	    $("#map_canvas").css({'width':'320px','height':'350px'});
+	    var map = new GMap2(document.getElementById("map_canvas"));
+	    var center = new GLatLng(loc.coords.latitude, loc.coords.longitude);
+	    map.setCenter(center, 14);
+	    map.addControl(new GSmallMapControl());
+	    map.addControl(new GMapTypeControl());
+	    map.addOverlay(new GMarker(center, {draggable: false, title: "You are here (more or less)"}));
+	}
+    </script>
+</head>
+<body onload="init_map()">
+    <form>
+	<input type="button" onclick="initiate_geolocation();" value="Get Location"/>
+    </form>
+    <!--button id="btnInit">Find my location</button-->
+    <div id="status">init...</div>
+    <div id="info">No info</div>
+    <div id="map_canvas"></div>
+</body>
+</html>

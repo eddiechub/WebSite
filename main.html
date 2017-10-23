@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Note the P tag is used to locate the A tag for the properties w/out affecting the weather script.  -->
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+<link rel="stylesheet" type="text/css" href="pagedefs.css" media="screen" charset="utf-8" title="edsdefs"/>
+<!--link rel="alternate" type="application/rss+xml" title="Ed's Feed" href="http://home.comcast.net/~chubin2/rss.xml"/-->
+<title>Ed's Page</title>
+<link rel="icon" href="favicon.ico" type="image/x-icon"/>
+<!-- link rel="icon" href="ed@yahoo.png" type="image/x-icon"/-->
+<meta name="description" content="Lots of links and services"/>
+<meta name="keywords" content="services,links,blogs"/>
+<meta name="robots" value="noindex,nofollow"/>
+<script src="http://twitter.com/javascripts/blogger.js"></script>
+<!--script src="css_browser_selector.js"></script-->
+<!--script src="mootools-release-1.11.js" charset="utf-8"></script-->
+<!--script src="script/modernizr-latest.js"></script-->
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDBp6HMljcKYb-V0ngwo80prfnWo_XbwWE&sensor=false"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="jquery-blink.js" language="javscript" type="text/javascript"></script>
+<script language="JavaScript">
+function twitterCallbackLocal(twitters) {
+    var statusHTML = "";
+    for (var i=0; i<twitters.length; i++){
+	var text    = twitters[i].text;
+	var user    = twitters[i].user.screen_name;
+	var id      = twitters[i].id_str.toString();
+	var time    = relative_time(twitters[i].created_at);
+	statusHTML += '<ul><li>'+text+'</li><a style="font-size:85%" href="https://twitter.com/'+user+'/status/'+id+'" target="_blank">'+time+'</a>';
+    }
+    document.getElementById('twitter_update_list').innerHTML = statusHTML;
+}
+//var geocoder;
+function initialize_location() {
+    //geocoder = new google.maps.Geocoder();
+    document.getElementById("navwin").value = "Navigation Not Set";
+    if ( navigator.geolocation ) {
+	navigator.geolocation.getCurrentPosition(update_nav,error_nav);
+    }
+}
+/*
+ *  why so many results? Here using the first results[0]
+ */
+function getCity(results)
+{
+    for (var i=0; i<results[0].address_components.length; i++) {
+	for (var b=0;b<results[0].address_components[i].types.length;b++) {
+	    if (results[0].address_components[i].types[b] == "locality") {
+		city = results[0].address_components[i];
+		return(city.long_name);
+	    }
+	}
+    }
+}
+function getState(results)
+{
+    for (var i=0; i<results[0].address_components.length; i++) {
+	for (var b=0;b<results[0].address_components[i].types.length;b++) {
+	    if (results[0].address_components[i].types[b] == "administrative_area_level_1") {
+		state = results[0].address_components[i];
+		return(state.short_name);
+	    }
+	}
+    }
+}
+function getCountry(results)
+{
+    for (var i=0; i<results[0].address_components.length; i++) {
+	for (var b=0;b<results[0].address_components[i].types.length;b++) {
+	    if (results[0].address_components[i].types[b] == "country") {
+		country = results[0].address_components[i];
+		return(country.short_name);
+	    }
+	}
+    }
+}
+function showLocation(results, status)
+{
+    if (status == google.maps.GeocoderStatus.OK) {
+	console.log(results)
+	if (results[1]) {
+	    document.getElementById("navwin").value = getCity(results) + ", " + getState(results) + ", " + getCountry(results);
+	    /* -- could use already formatted address
+	    document.getElementById("navwin").value = results[0].formatted_address;
+	    */
+	} else {
+	    document.getElementById("navwin").value = "No city for lat=" + lat + " Lng=" + lng;
+	}
+    } else {
+	document.getElementById("navwin").value = "Geocoder failed due to: " + status;
+    }
+    // Look for rep- http://googleapis.com/civicinfo/us_v1/representatives/lookup
+}
+function update_nav(position)
+{
+    /*
+    var output_str = "Latitude=" + position.coords.latitude + " Longitude=" + position.coords.longitude;
+    document.getElementById("navwin").value = output_str;
+    */
+    var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+    var geocoder = new google.maps.Geocoder();
+    geocoder.geocode({'latLng': latlng}, showLocation);
+}
+function error_nav(error)
+{
+    var msg;
+    switch(error.code)
+    {
+    case error.PERMISSION_DENIED:
+	msg="Geolocation not allowed";
+	break;
+    case error.POSITION_UNAVAILABLE:
+	msg="Location information is unavailable.";
+	break;
+    case error.TIMEOUT:
+	msg="The request to get user location timed out.";
+	break;
+    case error.UNKNOWN_ERROR:
+	msg="An unknown error occurred.";
+	break;
+    }
+    document.getElementById("navwin").value = msg;
+}
+
+function get_date_string()
+{
+    var dateVar = new Date();
+    var yr = dateVar.getFullYear();
+    var mo = dateVar.getMonth();
+    var s_mo = (++mo < 10) ? "0" + mo : mo;
+
+    var dt = dateVar.getDate();
+    var s_dt = (dt < 10) ? "0" + dt : dt;
+
+    var hr = dateVar.getHours();
+    var s_hr = (hr < 10) ? "0" + hr : hr;
+
+    var mi = dateVar.getMinutes();
+    var s_mi = (mi < 10) ? "0" + mi : mi;
+
+    var se = dateVar.getSeconds();
+    var s_se = (se < 10) ? "0" + se : se;
+
+    var output_str = "" + yr + s_mo + s_dt + ":" + s_hr + s_mi + s_se;
+    /* output_str = dateVar.toLocaleString(); */
+    return(output_str);
+}
+function update_time()
+{
+    var wait_time = 500;
+    var dateVar = new Date();
+    document.getElementById("datewin").value = dateVar.toLocaleString();
+    /*document.getElementById("datewin").value = get_date_string();*/
+    setTimeout("update_time()", wait_time)
+}
+function init_stuff() {
+    var url = 'https://api.twitter.com/1/statuses/user_timeline.json?include_entities=true&screen_name=eddiechub&callback=twitterCallbackLocal&count=1';
+    var script = document.createElement('script');
+    script.setAttribute('src', url);
+    document.body.appendChild(script);
+
+    initialize_location();
+    update_time();
+}
+$(document).ready(
+    function()
+    {
+	//$('.blink').blink(); // default is 500ms blink interval.
+	$('.blink').blink({delay:100}); // causes a 100ms blink interval.
+    });
+</script>
+</head>
+
+<body onload="init_stuff();">
+<!--header>HTML5 Header</header-->
+<!--footer>HTML5 Header</footer-->
+<div id="container">
+<div id="upper">
+<div id="left">
+<!--
+-->
+<!--
+    <div style="width:197px;text-align:center;font-size:0.6em;margin-top:0.5em;">
+	<a href="http://www.showmyweather.com/" title="Show My Weather Forecast" onclick="window.open(this.href);return(false);">
+	    <script type="text/javascript" src="http://www.showmyweather.com/weather_widget.php?int=0&type=js&country=us&state=Illinois&city=Chicago&smallicon=0&current=1&forecast=0&background_color=0&color=000000&width=175&padding=10&border_width=0&border_color=0&font_size=16&font_family=Verdana&showicons=1&measure=F">
+	    </script>
+	</a>
+    </div>
+-->
+<script type="text/javascript" src="http://voap.weather.com/weather/oap/60603?template=EVNTV&par=1003061690&unit=0&key=db20ec006ea56b30fc2aa93db9b6122e/"> </script>
+<!--
+By accessing and/or using this code snippet, you agree to AccuWeathers terms and conditions (in English) which can be found at http://www.accuweather.com/en/free-weather-widgets/terms and AccuWeathers Privacy Statement (in English) which can be found at http://www.accuweather.com/en/privacy.
+-->
+<script type="text/javascript" src="http://oap.accuweather.com/launch.js"></script>
+<a href="http://www.accuweather.com/en/us/chicago-il/60608/weather-forecast/348308" class="aw-widget-legal">
+<div id="awcc1469735381604" class="aw-widget-current"  data-locationkey="" data-unit="f" data-language="en-us" data-useip="true" data-uid="awcc1469735381604">
+</div>
+</a>
+
+    <a href="http://www.google.com/gmail"  target="_blank"class="super awesome">Super Awesome GMAIL Button</a>
+    <a href="http://www.giveawayoftheday.com" target="_blank"><img src="http://www.giveawayoftheday.com/ticker/ticker2.png" alt="Daily Giveaway" style="border: none"></a>
+    <!--
+    <a href="http://www.dealadaysites.com/" target="_blank"><img src="http://www.dealadaysites.com/deal_a_day_sites_com_banner.jpg" border="0" alt="List of Daily Deal Websites"></a>
+    <a href="http://twitpic.com/e3yxsd" title="Retweet if you&#039;re the #GivingType! on Twitpic"><img src="http://twitpic.com/show/thumb/e3yxsd.jpg" width="150" height="150" alt="Retweet if you&#039;re the #GivingType! on Twitpic"></a-->
+    <!--
+    [if (!IE)|(IE gte 9)]
+	<audio id="aplayer" controls="controls" preload="metadata" autobuffer>
+	    <source src="harrison.mp3"/>
+	    <i class="small awesome">HTML5 audio not supported</i>
+	</audio>
+    <![endif]
+    -->
+<!--
+    <div id="twitter_div">
+	<h2 class="twitter-title">Eds Twitter</h2><span class="blink">To be filled in</span>
+	<ul id="twitter_update_list"></ul>
+    </div>
+-->
+
+<!--
+    <div><img src="EdsLinuxRegistration.png"/></div>
+    <source src="7walkers2010-12-30s1t01.ogg" type="audio/ogg"/>
+    <source type="audio/mp3" src="harrison.mp3" />
+    <source src="test.mp3" type="audio/mp3"/>
+    <script type="text/javascript" language="JavaScript" src="http://twittercounter.com/embed/?username=eddiechub&style=bird"></script>
+    <script type="text/javascript" language="JavaScript" src="http://twittercounter.com/embed/eddiechub/ffffff/111111"></script>
+-->
+    <!--
+    [if !IE]>   
+	<canvas id="myCanvas"></canvas>
+	<script type="text/javascript">
+	    var canvas=document.getElementById('myCanvas');
+	    var ctx=canvas.getContext('2d');
+	    ctx.fillStyle='#FF0000';
+	    ctx.fillRect(0,0,80,100);
+	</script> 
+    <![endif]
+    -->  
+
+</div>
+<div id="right">
+<!--
+    <div id="top">
+	<iframe src="http://www.google.com/uds/modules/elements/newsshow/iframe.html"
+		   frameborder="0" width="750" height="110" marginwidth="0" marginheight="0">
+	</iframe>
+    </div>
+-->
+    <div id="content">
+	<span id="heading">Information</span>
+	<A href="http://www.travelmidwest.com/lmiga/map.jsp?mapname=chicagoArea" target="_blank">Highway Times</A>
+	<A href="http://www.metrarail.com/schedule.html" target="_blank">Metra</A>
+	<A href="http://www.pacebus.com/" target="_blank">Pace</A>
+	<A href="http://www.transitchicago.com" target="_blank">CTA</A>
+	<A href="http://kjo84.typepad.com/cta_tattler/" target="_blank">CTA Tattler</A>
+	<A href="http://www.flychicago.com/" target="_blank">Chicago Airport Info</A>
+	<A href="http://www.bbbonline.org/" target="_blank">BBBOnLine</A>
+	<A href="http://en.wikipedia.org/wiki/Main_Page" target="_blank">Wikipedia Today</A>
+	<A href="http://www.snopes.com/" target="_blank">Urban Legend Reference</A>
+	<A href="http://www.straightdope.com" target="_blank">Straight Dope Archive</A>
+	<A href="http://www.truthorfiction.com/" target="_blank">Truth or Fiction</A>
+	<A href="http://TicketStub.com" target="_blank">TicketStub (Ira's Site)</A>
+	<A href="https://mozy.com/" target="_blank">Free Secure Offsite Backup!</A>
+	<A href="http://www.illinoislegalaid.org/" target="_blank">Illinois Legal Resources</A>
+	<A href="http://www.cutmypic.com/" target="_blank">Cut My PIC</A>
+	<A href="http://lifehacker.com/most-popular-how-to-guides-of-2013-1474868022" target="_blank">Lifehacker Guides</A>
+	<A href="http://projects.propublica.org/emergency/" target="_blank">ER Wait Times</A>
+	<A href="http://www.angelicorganics.com" target="_blank">Angelic Organic Farm</A>
+	<A href="http://firstopinionapp.com/" target="_blank">Text a doctor for free</A>
+	<A href="http://www.bedbugregistry.com/" target="_blank">The Bedbug Registry (ewww)</A>
+	<A href="http://www.chromium.org/glossary" target="_blank">Acronym Glossary</A>
+	<A href="http://www.ipcc.ch/publications_and_data/publications_and_data_reports.shtml" target="_blank">IPCC Climate Change Reports</A>
+	<A href="http://www.climatecentral.org/states-of-change#/nation" target="_blank">More Climate Change Reports</A>
+	<A href="http://www.realclimate.org/" target="_blank">Climate Change Science Status</A>
+	<A href="http://bedbugregistry.com/" target="_blank">Bedbug Regsitry (yuck)</A>
+	<A href="http://www.getmyfbifile.com/" target="_blank">Get My FBI File</A>
+	<A href="http://datausa.io/" target="_blank">USA Data</A>
+	<A href="http://click-that-hood.com/" target="_blank">Click that Hood!</A>
+	<A href="https://www.ftccomplaintassistant.gov/#&panel1-1" target="_blank">FTC Complaint Assistant</A>
+	<A href="http://www.travelandleisure.com/trip-ideas/national-parks/best-national-parks-by-state" target="_blank">Best National Parks by State</A>
+	<A href="https://www.nomoreransom.org/" target="_blank">Fight Ransomware</A>
+
+	<span id="heading">Deals</span>
+	<A href="http://www.hottix.org/" target="_blank">Chicago HotTix</A>
+	<A href="http://www.bensbargains.net/" target="_blank">Bens Bargains</A>
+	<A href="http://www.techbargains.com/" target="_blank">Tech Bargains</A>
+	<A href="http://www.woot.com/" target="_blank">Woot Deal of the Day</A>
+	<A href="http://www.meh.com/" target="_blank">Meh Deal of the Day</A>
+	<A href="http://www.giveawayoftheday.com/" target="_blank">Giveaway Of The Day</A>
+	<A href="http://www.dealsofamerica.com/" target="_blank">Deals of America</A>
+	<A href="http://www.geeks.com/" target="_blank">Computer Geek Prices</A>
+	<A href="http://www.gotapex.com/" target="_blank">APEX Deals</A>
+	<A href="http://www.pricewatch.com/" target="_blank">PriceWatch</A>
+	<A href="http://www.currentcodes.com/show/range/2" target="_blank">Codes and Discounts</A>
+	<A href="http://www.thebestfree.net/" target="_blank">Get Free Stuff!</A>
+	<A href="http://www.fatwallet.com/" target="_blank">Fat Wallet</A>
+	<A href="http://www.justsnipe.com/" target="_blank">JustSnipe: eBay auction sniper</A>
+	<A href="http://www.phantombidder.com/PhantomBidder/Default.asp" target="_blank">PhantomBidder: eBay Agent</A>
+
+	<span id="heading">Financial</span>
+	<A href="http://www.kitco.com/" target="_blank">Live Gold Prices</A>
+	<A href="http://www.clark.com/credit-freeze-and-thaw-guide" target="_blank">How to Freeze Your Credit</A>
+	<A href="https://research.stlouisfed.org/fred2/" target="_blank">St. Louis Fed Economic Data</A>
+	<A href="http://www.freemoneyfinance.com/2006/10/how_to_choose_t.html" target="_blank">How to choose Credit Card</A>
+	<A href="http://www.personalcapital.com" target="_blank">Personal Capital</A>
+	<A href="http://www.schwab.com" target="_blank">Schwab</A>
+	<A href="http://www.carbuyingtips.com/carintro.html" target="_blank">Car Buying Tips</A>
+	<A href="http://www.mapgasprices.com/" target="_blank">Map Gas Prices!</A>
+	<A href="http://www.illinoispirgedfund.org/issues/mdf/protecting-yourself-identity-theft" target="_blank">Protect from Identity Theft</A>
+    </div>
+    <div id="content">
+	<span id="heading">Technical</span>
+	<A href="http://infocenter.sybase.com" target="_blank">Sybase Books</A>
+	<A href="http://ostermiller.org/calc/cheat.html" target="_blank">Programers CheatSheet</A>
+	<A href="http://search.safaribooksonline.com" target="_blank">Safari Books</A>
+	<A href="http://www.computer.org/portal/web/computingnow" target="_blank">IEEE Computing Now</A>
+	<A href="http://www.anonymizer.com/" target="_blank">Anonymizer (what others see)</A>
+	<A href="http://www.htmlhelp.com/reference/css/references.html" target="_blank">CSS references</A>
+	<A href="http://www.dustindiaz.com/css-shorthand" target="_blank">CSS short hand</A>
+	<A href="http://www.programmingebooks.tk/" target="_blank">Free Programming Books Online</A>
+	<A href="http://www.ddj.com/" target="_blank">Doctor Dobbs Journal</A>
+	<A href="http://www.devshed.com/" target="_blank">DevShed</A>
+	<A href="http://www.dzone" target="_blank">DZone</A>
+	<A href="http://www.speakeasy.net/speedtest" target="_blank">speed test cable</A>
+	<A href="http://www.pankaj-k.net/weblog-archive/000076.html" target="_blank">Pankaj Kumar's Best Utils</A>
+	<A href="http://www.combobulate.com/coolprogs.htm" target="_blank">Combobulate: Cool Programs</A>
+	<A href="http://www.tweakguides.com/XPTC.html" target="_blank">Tweak Guides</A>
+	<A href="http://www.babeldisk.com/index.php" target="_blank">BabelDisc -- Linux On Line Computing</A>
+	<A href="http://www.itools.com/" target="_blank">Best tools for the job</A>
+	<A href="https://startpage.com/" target="_blank">Private Start/Search Page</A>
+	<A href="http://www.yolinux.com/TUTORIALS/ClearcaseCommands.html" target="_blank">Clearcase Commands</A>
+	<A href="https://github.com" target="_blank">GitHub Developer</A>
+	<A href="http://www.engineerguy.com/" target="_blank">The Engineer Guy</A>
+	<A href="https://ifttt.com/recipes?page=5&sort=popular&utf8=%E2%9C%93" target="_blank">Internet Recipies (IFTTT)</A>
+
+	<span id="heading">Tech Blogs</span>
+	<A href="http://www.thauvin.net/linkblog/" target="_blank">Erik's Blog (Technical)</A>
+	<A href="http://stallman.org/" target="_blank">Richard Stallman</A>
+	<A href="http://geekswithblogs.net/evjen/" target="_blank">Bill Evjen's Blog (Technical)</A>
+	<A href="http://www.peacetakescourage.com/page-home.htm" target="_blank">Peace Takes Courage</A>
+	<A href="http://www.livejournal.com/" target="_blank">LiveJournal: Create BLOG</A>
+	<A href="http://www.blogger.com/start" target="_blank">Blogger: Create BLOG</A>
+	<A href="http://wordpress.org/" target="_blank">WordPress: Create BLOG</A>
+	<A href="http://debunkatron.com/" target="_blank">Debunkatron</A>
+
+	<span id="heading">Learning</span>
+	<A href="https://www.udemy.com" target="_blank">Udemy</A>
+	<A href="http://www.duolingo.com" target="_blank">Duolingo Languages</A>
+	<A href="https://www.lingq.com/" target="_blank">LingQ Languages</A>
+	<A href="https://www.coursera.org/" target="_blank">Coursera</A>
+	<A href="http://www.codecademy.com/" target="_blank">Codecademy</A>
+	<A href="http://www.investoo.com/" target="_blank">Investoo</A>
+	<A href="https://www.udacity.com/" target="_blank">Udacity</A>
+	<A href="https://www.futurelearn.com/courses/upcoming" target="_blank">FutureLearn</A>
+	<A href="http://courses.writinguniversity.org/" target="_blank">TheWritingUniversity</A>
+	<A href="http://www.instructables.com/" target="_blank">Instructables</A>
+	<A href="http://www.investinginbonds.com/learnmore.asp?catid=46" target="_blank">Bond Basics</A>
+	<A href="http://www.openculture.com/free_certificate_courses" target="_blank">Free OnLine Courses (MOOCs)</A>
+	<A href="http://documentaryheaven.com/" target="_blank">Free Documentaries</A>
+	<A href="http://www.ifixit.com/" target="_blank">The free repair manual</A>
+	<A href="https://www.duolingo.com/" target="_blank">Duolingo Language Learning</A>
+	<A href="https://hamstudy.org/" target="_blank">Ham Radio Study Guides</A>
+
+	<span id="heading">Podcasts</span>
+	<A href="http://noagendashow.com/" target="_blank">NoAgenda: Best Podcast in the Universe</A>
+	<A href="http://www.theskepticsguide.org/" target="_blank">Skeptics Guide to the Universe</A>
+	<A href="http://www.panoply.fm/shows" target="_blank">Panoply: Slate Podcasts</A>
+	<A href="http://www.maximumfun.org/" target="_blank">Maximum Fun: Podcasts</A>
+	<A href="https://soundcloud.com/the-bugle" target="_blank">The bugle</A>
+
+    </div>
+    <div id="content">
+	<span id="heading">Interest</span>
+	<A href="http://www.natkd.com/tkd_forms.htm" target="_blank">TaiKwonDo Forms</A>
+	<A href="http://utf.whsites.net/index.html" target="_blank">UTF TaiKwonDo</A>
+	<A href="http://www.summahistorica.com/" target="_blank">SummaHistorica: History According to Bob</A>
+	<A href="http://asoftmurmur.com/" target="_blank">Ambiet Sounds</A>
+	<A href="http://www.deafchildren.org/" target="_blank">Society for Deaf Children</A>
+	<A href="http://www.ready.gov/" target="_blank">Be READY (for terrorism)</A>
+	<A href="http://www.capweb.net/" target="_blank">Guide to US Congress</A>
+	<A href="http://www.darwinawards.com/" target="_blank">The Darwin Awards</A>
+	<A href="http://www.ems.psu.edu/~fraser/BadScience.html" target="_blank">Bad Science</A>
+	<A href="http://www.nature.com/" target="_blank">Nature</A>
+	<A href="http://www.adlerplanetarium.org" target="_blank">Adler Planetarium</A>
+	<A href="http://www.astroleague.org" target="_blank">Astroleague</A>
+	<A href="http://www.badastronomy.com/" target="_blank">Bad Astronomy</A>
+	<A href="http://www.n2yo.com" target="_blank">Satellite Tracking</A>
+	<A href="http://www.chesstactics.org/" target="_blank">Chess Tactics</A>
+	<A href="http://www.thechesswebsite.com/" target="_blank">The Chess Website</A>
+	<A href="http://www.aaaclipart.com/" target="_blank">AAA Free Clip Art!</A>
+	<A href="http://www.drinkboy.com/" target="_blank">DrinkBoy Cocktails</A>
+	<A href="http://www.veganstreet.com/veganliving/chicagodine.html" target="_blank">Vegan Dining in Chicago</A>
+	<A href="get_location.html" target="_blank">Geo-Location HTML5 Test</A>
+	<A href="mailto:edchubin@vtext.com">EMail Ed's Phone</A>
+	<A href="http://www.ilovepickles.org" target="_blank">Pickle Primer</A>
+	<A href="http://yucky.kids.discovery.com/body/" target="_blank">Yucky Body</A>
+	<A href="http://www.exploratorium.edu/cooking/" target="_blank">Science Of Cooking</A>
+	<A href="http://www.bbqmyths.com/" target="_blank">BBQ Myths</A>
+	<A href="http://www.tug2.net/" target="_blank">Timeshare User Group</A>
+	<A href="http://www.alltimeshare.com/" target="_blank">Timeshare Resale</A>
+	<A href="http://www.frugalfun.com" target="_blank">FrugalFun.com</A>
+	<A href="http://www.damninteresting.com/" target="_blank">Damm Interesting</A>
+	<A href="http://www.iwillknot.com/" target="_blank">Tie Knots</A>
+	<A href="http://www.religionfacts.com/big_religion_chart.htm" target="_blank">Religion Facts</A>
+	<A href="http://ps-survival.com/" target="_blank">Pole Shift Survival</A>
+	<A href="http://www.airlive.net/" target="_blank">Track Airplanes</A>
+
+	<span id="heading">Political Blogs</span>
+	<A href="http://dailykos.com/" target="_blank">Dailykos (Left)</A>
+	<A href="http://www.truth-out.org/buzzflash/" target="_blank">Truthout/Buzzflash (Far-Left)</A>
+	<A href="http://Instapundit.com/" target="_blank">Instapundit (Right)</A>
+	<A href="http://www.newshounds.us/" target="_blank">They watch FOX so we don't have to!</A>
+	<A href="http://www.talkingpointsmemo.com/" target="_blank">Talking Points: Joshua Micah Marshall</A>
+
+	<span id="heading">Entertainment</span>
+	<A href="http://flicksurfer.com/" target="_blank">Netflix Surfer</A>
+	<A href="http://whatsonnetflix.com/netflix-hacks/the-netflix-id-bible-every-category-on-netflix/2/" target="_blank">Netflix Bible</A>
+	<A href="http://www.fark.com/" target="_blank">It's not news, its FARK!</A>
+	<A href="http://www.laugh.com/" target="_blank">Laugh.com - Comedians</A>
+	<A href="http://www.radiolovers.com/" target="_blank">Old Time Radio</A>
+	<A href="http://www.collegehumor.com/" target="_blank">College Humor (some NSFW)</A>
+	<A href="http://www.ovguide.com/" target="_blank">Online Video (Free, SCTV and more!)</A>
+	<A href="CardRules.html" target="_blank">Good Poker Game Rules</A>
+	<A href="CasinoGames.html" target="_blank">Casino Games</A>
+
+	<span id="heading">Music/Art</span>
+	<A href="http://www.dead.net/" target="_blank">The Grateful Dead</A>
+	<A href="http://arts.ucsc.edu/gdead/agdl/" target="_blank">The Annotated Grateful Dead Lyrics</A>
+	<A href="http://heebmagazine.com/links-for-shomer-shabbos-deadheads/40903" target="_blank">Grateful Dead Yids</A>
+	<A href="http://www.phish.com/" target="_blank">Phish</A>
+	<A href="http://www.zappa.com/" target="_blank">Frank Zappa</A>
+	<A href="http://www.kindweb.com/" target="_blank">KindWeb</A>
+	<A href="http://thejamzone.com/" target="_blank">The Jam Zone</A>
+	<A href="http://www.mcescher.com/Gallery/gallery.htm" target="_blank">The Official M.C. Escher Website</A>
+    </div>
+    <span id="center"><img src="http://www.danasoft.com/vipersig.jpg" border="0"></span>
+</div>
+<div id="footer">
+    <div id="footer-content">
+    <!--
+    <SCRIPT LANGUAGE="JavaScript">
+    function replaceme(obj, user, domain)
+    {
+	obj.outerHTML = '<a href="mailto:' + user + '@' + domain + '">Eds Page - Thanks for visiting!</a>';
+    }
+    </SCRIPT>
+    <a href="#" onmouseover="replaceme(this,'ed_chubin','hotmail.com')"> Eds Page - Thanks for visiting!  </a>
+    -->
+    <span id="left">
+	<img height="30" src="smbear01.jpg"/>
+    </span>
+    <span id="left">
+	Eds Page - Thanks for visiting!
+    </span>
+    <span id="right">
+	<img height="30" src="smbear01.jpg"/>
+    </span>
+    <span id="right">
+	<input id="datewin" class="text" type="text" size="30" maxlength="30" >&nbsp;
+    </span>
+    <span id="right">
+	<img height="30" src="smbear01.jpg"/>
+    </span>
+    <span id="right">
+	<input id="navwin" class="text" type="text" size="35" maxlength="35" >&nbsp;
+    </span>
+    <span id="right">
+	<img height="30" src="smbear01.jpg"/>
+    </span>
+    </div>
+</div>
+</div>
+</body>
+</html>
